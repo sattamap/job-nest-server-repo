@@ -34,16 +34,26 @@ async function run() {
 
     const jobsCollection = client.db('JobNestDB').collection('jobs');
 
+          //job related API
+          app.get('/jobs', async (req, res) => {
+            const cursor = jobsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+            })
 
 
-    app.post('/jobs', async (req, res) => {
-        const newJob = req.body;
-        console.log(newJob);
-        const result = await jobsCollection.insertOne(newJob);
+          app.post('/jobs', async (req, res) => {
+                const newJob = req.body;
+                console.log(newJob);
+                const result = await jobsCollection.insertOne(newJob);
+        
+                res.send(result);
+        
+            })
 
-        res.send(result);
+    
 
-    })
+   
 
 
 
