@@ -41,6 +41,12 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        //API endpoint for retrieving applied jobs
+        app.get('/appliedJobs', async (req, res) => {
+            const cursor = appliedJobsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
         // API endpoint for retrieving a single job by ID
 
