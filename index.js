@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 
@@ -33,6 +33,7 @@ async function run() {
     await client.connect();
 
     const jobsCollection = client.db('JobNestDB').collection('jobs');
+    const appliedJobsCollection = client.db('JobNestDB').collection('appliedJobs');
 
           //job related API
           app.get('/jobs', async (req, res) => {
@@ -42,20 +43,53 @@ async function run() {
             })
 
 
-          app.post('/jobs', async (req, res) => {
-                const newJob = req.body;
-                console.log(newJob);
-                const result = await jobsCollection.insertOne(newJob);
+        //   app.post('/jobs', async (req, res) => {
+        //         const newJob = req.body;
+               
+        //         const result = await jobsCollection.insertOne(newJob);
         
-                res.send(result);
+        //         res.send(result);
         
-            })
+        //     })
+
+        app.post('/jobs', async (req, res) => {
+            const newJob = req.body;
+            newJob.jobApplicantsNumber = 0; // Initialize the applicants field
+            const result = await jobsCollection.insertOne(newJob);
+            res.send(result);
+          });
+
+
+        //   app.post('/appliedJobs', async (req, res) => {
+        //         const applicationData = req.body;
+        //         console.log(applicationData);
+        //         const result = await appliedJobsCollection.insertOne(applicationData);
+        
+        //         res.send(result);
+        
+        //     })
+
+
+        app.post('/appliedJobs', async (req, res) => {
+            const applicationData = req.body;
+            
+            // Update the job's applicant count using the $inc operator
+            const jobId = applicationData.jobId;
+             // Convert the jobId to ObjectId
+  const jobObjectId = new ObjectId(jobId);
+          
+            // Update the job's applicant count by incrementing it by 1
+            await jobsCollection.updateOne(
+                { _id: jobObjectId },
+                { $inc: { jobApplicantsNumber: 1 } }
+              );
+          
+            const result = await appliedJobsCollection.insertOne(applicationData);
+          
+            res.send(result);
+          });
 
     
-
-   
-
-
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
