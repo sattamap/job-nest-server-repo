@@ -62,7 +62,8 @@ async function run() {
 
         app.post('/jobs', async (req, res) => {
             const newJob = req.body;
-            newJob.jobApplicantsNumber = 0; // Initialize the applicants field
+            //newJob.jobApplicantsNumber = 0; // Initialize the applicants field
+            newJob.jobApplicantsNumber = parseInt(newJob.jobApplicantsNumber, 10);
             const result = await jobsCollection.insertOne(newJob);
             res.send(result);
         });
@@ -104,6 +105,7 @@ async function run() {
             const id = req.params.id;
             const jobs = req.body;
             console.log('new user', id, jobs);
+            jobs.jobApplicantsNumber = parseInt(jobs.jobApplicantsNumber, 10);
             const filter = { _id: new ObjectId(id) }
             const options = { upsert: true }
             const updatedJob = {
