@@ -12,12 +12,7 @@ const port = process.env.PORT || 5000;
 
 //middleware
 
-app.use(cors({
-    origin: [
-        'http://localhost:5173'
-    ],
-    credentials:true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
@@ -64,7 +59,7 @@ const verifyToken = (req, res, next) =>{
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7) 
-        await client.connect();
+        // await client.connect();
 
         const jobsCollection = client.db('JobNestDB').collection('jobs');
         const appliedJobsCollection = client.db('JobNestDB').collection('appliedJobs');
@@ -108,7 +103,7 @@ async function run() {
         //API endpoint for retrieving applied jobs
         app.get('/appliedJobs', async (req, res) => {
            //logger,verifyToken, 
-        //     console.log("Query:",req.query.email);
+            console.log("Query:",req.query.email);
         //     console.log("token:",req.cookies);
         //    console.log('Token owner is:',req.user);
         //     if(req.user.email !==req.query.email){
