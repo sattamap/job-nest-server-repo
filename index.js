@@ -37,23 +37,6 @@ const logger = (req,res, next) =>{
     next();
 }
 
-const verifyToken = (req, res, next) =>{
-    const token = req?.cookies?.token;
-   console.log('token in the middleware:', token);
-  
-    if(!token){
-        return res.status(401).send({message: "Unauthorized Access"})
-    }
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
-       if(err){
-        return res.status(401).send({message: 'Unauthorized access'})
-       } 
-       console.log("decoded:",decoded);
-       req.user = decoded;
-       next();
-      
-    })
-}
 
 
 async function run() {
@@ -102,13 +85,7 @@ async function run() {
         })
         //API endpoint for retrieving applied jobs
         app.get('/appliedJobs', async (req, res) => {
-           //logger,verifyToken, 
-            console.log("Query:",req.query.email);
-        //     console.log("token:",req.cookies);
-        //    console.log('Token owner is:',req.user);
-        //     if(req.user.email !==req.query.email){
-        //         return res.status(403).send({message: 'Forbidden access'})
-        //     }
+  
             const cursor = appliedJobsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
