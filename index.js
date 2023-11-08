@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken')
-const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
@@ -19,7 +19,7 @@ app.use(cors({
     credentials:true
 }));
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 
 
@@ -35,6 +35,32 @@ const client = new MongoClient(uri, {
     }
 });
 
+//middlewre
+
+const logger = (req,res, next) =>{
+    console.log('log info:',req.method, req.url);
+    next();
+}
+
+const verifyToken = (req, res, next) =>{
+    const token = req?.cookies?.token;
+   console.log('token in the middleware:', token);
+  
+    if(!token){
+        return res.status(401).send({message: "Unauthorized Access"})
+    }
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+       if(err){
+        return res.status(401).send({message: 'Unauthorized access'})
+       } 
+       console.log("decoded:",decoded);
+       req.user = decoded;
+       next();
+      
+    })
+}
+
+
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7) 
@@ -49,12 +75,17 @@ async function run() {
             const user = req.body;
             console.log("user for token", user);
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET , {expiresIn: '1h'})
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: true,
-                sameSite:'none'
-            })
+            res.cookie(
+                "token",
+                token,
+                {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production" ? true: false,
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+                }
+            )
            .send({success:true});
+       
            
         })
         
@@ -69,12 +100,20 @@ async function run() {
    
         //API endpoint for retrieving all jobs
         app.get('/jobs', async (req, res) => {
+            console.log("Query:",req.query.email);
             const cursor = jobsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
         //API endpoint for retrieving applied jobs
         app.get('/appliedJobs', async (req, res) => {
+           //logger,verifyToken, 
+        //     console.log("Query:",req.query.email);
+        //     console.log("token:",req.cookies);
+        //    console.log('Token owner is:',req.user);
+        //     if(req.user.email !==req.query.email){
+        //         return res.status(403).send({message: 'Forbidden access'})
+        //     }
             const cursor = appliedJobsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
