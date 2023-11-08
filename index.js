@@ -58,7 +58,7 @@ async function run() {
             res.send(result);
         })
 
-       //API for job  creating a new job
+        //API for job  creating a new job
 
         app.post('/jobs', async (req, res) => {
             const newJob = req.body;
@@ -68,17 +68,7 @@ async function run() {
             res.send(result);
         });
 
-
-        //   app.post('/appliedJobs', async (req, res) => {
-        //         const applicationData = req.body;
-        //         console.log(applicationData);
-        //         const result = await appliedJobsCollection.insertOne(applicationData);
-
-        //         res.send(result);
-
-        //     })
-
-           //job applicant count and inserted application data in /appliedJobs API
+        //job applicant count and inserted application data in /appliedJobs API
 
         app.post('/appliedJobs', async (req, res) => {
             const applicationData = req.body;
@@ -99,7 +89,7 @@ async function run() {
             res.send(result);
         });
 
-      // API endpoint for updating a job by ID
+        // API endpoint for updating a job by ID
 
         app.put('/jobs/:id', async (req, res) => {
             const id = req.params.id;
@@ -128,7 +118,7 @@ async function run() {
             res.send(result);
         });
 
-       //API endpoint for deleting a job by ID
+        //API endpoint for deleting a job by ID
 
         app.delete('/jobs/:id', async (req, res) => {
             const id = req.params.id;
