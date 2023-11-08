@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
@@ -18,6 +19,7 @@ app.use(cors({
     credentials:true
 }));
 app.use(express.json());
+app.use(cookieParser())
 
 
 
@@ -42,7 +44,7 @@ async function run() {
         const appliedJobsCollection = client.db('JobNestDB').collection('appliedJobs');
         
         //JWT token generation and cookie setting
-        
+
         app.post('/jwt', async(req,res)=>{
             const user = req.body;
             console.log("user for token", user);
@@ -55,7 +57,8 @@ async function run() {
            .send({success:true});
            
         })
-
+        
+        //user logout and clear JWT cookie
 
         app.post('/logout', async(req,res)=>{
             const user = req.body;
