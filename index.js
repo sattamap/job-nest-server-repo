@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
@@ -10,7 +11,12 @@ const port = process.env.PORT || 5000;
 
 //middleware
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173'
+    ],
+    credentials:true
+}));
 app.use(express.json());
 
 
@@ -29,12 +35,27 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        // Connect the client to the server	(optional starting in v4.7)
+        // Connect the client to the server	(optional starting in v4.7) 
         await client.connect();
 
         const jobsCollection = client.db('JobNestDB').collection('jobs');
         const appliedJobsCollection = client.db('JobNestDB').collection('appliedJobs');
+        
+        
+        app.post('/jwt', async(req,res)=>{
+            const user = req.body;
+            console.log("user for token", user);
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET , {expiresIn: '1h'})
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite:'none'
+            })
+           .send({success:true});
+           
+        })
 
+   
         //API endpoint for retrieving all jobs
         app.get('/jobs', async (req, res) => {
             const cursor = jobsCollection.find();
