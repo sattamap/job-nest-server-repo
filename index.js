@@ -41,6 +41,7 @@ async function run() {
         const jobsCollection = client.db('JobNestDB').collection('jobs');
         const appliedJobsCollection = client.db('JobNestDB').collection('appliedJobs');
         
+        //JWT token generation and cookie setting
         
         app.post('/jwt', async(req,res)=>{
             const user = req.body;
@@ -53,6 +54,13 @@ async function run() {
             })
            .send({success:true});
            
+        })
+
+
+        app.post('/logout', async(req,res)=>{
+            const user = req.body;
+            console.log("log out", user);
+            res.clearCookie('token',{maxAge: 0}).send({success: true})
         })
 
    
